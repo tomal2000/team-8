@@ -150,29 +150,133 @@
             <div class="card card-outline-secondary">
                 <div class="card-body">
                     <h3 class="text-center">অনলাইন পেমেন্ট</h3>
-                    {{-- <img src="{{ asset('assets/img/logo.jpg') }}" class="d-flex justify-content-start" alt="RIDDHO 16" style="width: 135px;
+                    <img src="{{ asset('assets/img/logo.jpg') }}" class="d-flex justify-content-start" alt="RIDDHO 16" style="width: 135px;
                     border-radius: 100%;
-                    border: 4px solid blue;"> --}}
+                    border: 4px solid blue;">
                     <hr>
                 <div >
-                    <div class="card text-center border-success mb-3">
+                    <div class="card order-success mb-3">
                     <div class="card-body">
                       <h5 class="card-title"></h5>
                       <div class="row">
                         <div class="col-md-12">
-                            <form class="row g-3" action="{{ route('payment.user_find') }}" method="POST">
+                            <form class="row g-3" action="" method="POST">
                                 @csrf
-                                <div class="col-auto">
-                                  <label for="staticEmail2" class="visually-hidden">ID/Mobile Number </label>
-                                  <input type="text" readonly class="form-control-plaintext" id="staticEmail2" value="ID/Mobile Number">
+                                <div class="form-group mb-3 required">
+                                    <label class="form-label" for="cc_name">আপনার নাম (ইংরেজি)</label >
+                                    <input type="text" class="form-control" name="name"  required="required" value="{{ $user->unique_id }}">
+                                    @error('name') <span class="error">{{ $message }}</span> @enderror
                                 </div>
-                                <div class="col-auto">
-                                  <label for="value" class="visually-hidden">ID/Mobile Number</label>
-                                  <input type="text" required class="form-control" id="value" name="value" placeholder="ID/Mobile Number">
+                                <div class="form-group mb-3 required">
+                                    <label class="form-label" for="cc_name">আপনার নাম (ইংরেজি)</label >
+                                    <input type="text" class="form-control" name="name"  required="required" value="{{ $user->first_name.' '.$user->last_name }}">
+                                    @error('name') <span class="error">{{ $message }}</span> @enderror
                                 </div>
-                                <div class="col-auto">
-                                  <button type="submit" class="btn btn-primary mb-3">Search</button>
+                                <div class="form-group mb-3 required">
+                                    <label class="form-label" for="cc_name">মোবাইল নাম্বার (ইংরেজি)</label >
+                                    <input type="text" class="form-control" name="mobile"  required="required" value="{{ $user->mobile}}">
+                                    @error('mobile') <span class="error">{{ $message }}</span> @enderror
                                 </div>
+                                {{-- <div class="form-group mb-3">
+                                    <label class="form-label" for="cc_name">অভিভাবক এর মোবাইল নাম্বার (ইংরেজি)</label >
+                                    <input type="text" class="form-control" id="cc_name"  title="First and last name" required="required">
+                                </div> --}}
+                                {{-- <div class="form-group mb-3 required">
+                                    <label class="form-label" for="cc_name">আসন সংখ্যা</label >
+                                <select class="form-control" name="seat"size="0" id="seat_no">
+
+                                    <option value="">নির্বাচন করুন</option>
+                                    <option value="01">০১</option>
+                                    <option value="02">০২</option>
+                                    <option value="03">০৩</option>
+                                    <option value="04">০৪</option>
+                                    <option value="05">০৫</option>
+                                    <option value="06">০৬</option>
+                                    <option value="07">০৭</option>
+                                    <option value="08">০৮</option>
+                                    <option value="09">০৯</option>
+                                    <option value="10">১০</option>
+                                </select>
+                                @error('seat') <span class="error">{{ $message }}</span> @enderror
+                            </div> --}}
+                            <div class="col-md-12">
+                                <div class="form-group mb-3 required">
+                                    <label class="form-label">পেমেন্ট এর মাধ্যম</label ><br>
+                                        <div id="radio">
+                                        {{-- @foreach ($programme->fees as $key => $fee)
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input payment_option" data-type="{{ $fee->type }}" data-price="{{ $fee->price }}" data-fee="{{ $fee->fee }}" type="radio" name="method" id="inlineRadio-{{ $fee->id }}" value="{{ $fee->id }}">
+                                            <label class="form-check-label" for="inlineRadio-{{ $fee->id }}">{{ $fee->name }}</label>
+                                          </div>
+                                        @endforeach --}}
+                                        {{-- <div class="form-check form-check-inline">
+                                            <input class="form-check-input payment_option" type="radio" name="method" id="inlineRadio1" value="bkash" checked>
+                                            <label class="form-check-label" for="inlineRadio1">বিকাশ</label>
+                                          </div>
+                                    <div class="form-check form-check-inline ">
+                                            <input class="form-check-input payment_option" type="radio" name="method" id="inlineRadio2" value="cash">
+                                            <label class="form-check-label" for="inlineRadio2">নগদ অর্থ</label>
+                                    </div> --}}
+                                    @error('method') <span class="error">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="operate_person" class="d-none">
+                            <div class="col-md-12" >
+                                {{-- <div class="form-group mb-3 required">
+                                    <label class="form-label">পেমেন্ট গ্রহনকারী</label ><br>
+                                        <select class="form-control" name="person" id="person">
+                                            <option value="">নির্বাচন করুন</option>
+                                            @foreach ($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name.'-'.$user->mobile }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('person') <span class="error">{{ $message }}</span> @enderror
+                                </div> --}}
+
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="cc_name">পেমেন্টের বিস্তারিত (ঐছিক)</label >
+                                        <textarea name="meta" id="meta" cols="50" rows="3" class="form-control" required="required" placeholder="বিকাশ/নগদ/রকেট,যে নাম্বার থেকে পাঠিয়েছেন,ট্রান্সেকসন আইডি, ইত্যাদি"></textarea>
+                                        @error('meta') <span class="error">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                <div class="form-group mb-3 required">
+                                    <label class="form-label">টাকার পরিমান</label >
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text" id="basic-addon1">৳</span>
+                                            <input type="text" class="form-control" placeholder="টাকার পরিমান" aria-label="Username" aria-describedby="basic-addon1" id="price" readonly>
+                                          </div>
+                                </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3 required">
+                                        <label class="form-label">পরিসেবা চার্জ</label >
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text" id="basic-addon1">৳</span>
+                                                <input type="text" class="form-control" placeholder="পরিসেবা চার্জ" aria-label="Username" aria-describedby="basic-addon1" id="charge" readonly>
+                                              </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3 required">
+                                        <label class="form-label">মোট টাকার পরিমান</label >
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text" id="basic-addon1">৳</span>
+                                                <input type="text" class="form-control" placeholder="মোট টাকার পরিমান" aria-label="Username" aria-describedby="basic-addon1" id="total" readonly>
+                                              </div>
+                                    </div>
+                                </div>
+                            </div>
+                                <hr>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-success btn-lg btn-block">পেমেন্ট করুন</button>
+                                </div>
+
                               </form>
                         </div>
                       </div>

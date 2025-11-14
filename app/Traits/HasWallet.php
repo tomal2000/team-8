@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Exceptions\InvalidAmountException;
 use App\Exceptions\InsufficientFundException;
+use App\Exceptions\InvalidTransactionException;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -21,8 +22,8 @@ trait HasWallet
         $transaction = $this->transactions()->create([
             'reference_id' => $transaction['reference_id'] ?? null,
             'gateway_id' => $transaction['gateway_id'] ?? null,
-            'initiator' => $transaction['initiator'] ?? 0,
-            'approver' => $transaction['approver'] ?? 0,
+            'initiator' => $transaction['initiator'] ?? null,
+            'approver' => $transaction['approver'] ?? null,
             'type' => 'credit',
             'module' => $transaction['module'],
             'narration' => $transaction['narration'],
@@ -38,15 +39,47 @@ trait HasWallet
         return $transaction;
     }
 
-    public function withdraw(int|float $amount,array $transaction): float|int
+    public function withdraw(int|float $amount,array $transaction): mixed
     {
         $this->throwExceptionIfAmountIsInvalid($amount);
 
         $this->throwExceptionIfFundIsInsufficient($amount);
 
         $this->decrement('balance', $amount);
-        return $this->balance;
+        $fee = $transaction['fee'] ?? 0;
+        $transaction = $this->transactions()->create([
+            'reference_id' => $transaction['reference_id'] ?? null,
+            'gateway_id' => $transaction['gateway_id'] ?? null,
+            'initiator' => $transaction['initiator'] ?? null,
+            'approver' => $transaction['approver'] ?? null,
+            'type' => 'credit',
+            'module' => $transaction['module'],
+            'narration' => $transaction['narration'],
+            'description' => $transaction['description'],
+            'principal_amount' => $transaction['principal_amount'],
+            'fee' => $fee,
+            'amount' => $amount - $fee,
+            'remain_balance' => $this->balance,
+            //'meta' => $transaction['meta'],
+            'status' => 'completed',
+        ]);
+
+        return $transaction;
     }
+
+
+
+    public function confirm(Transaction $transaction): mixed
+    {
+        if(!$this->transactions->where('id',$transaction->id)->first()){
+            throw new InvalidTransactionException();
+        }
+
+        $transaction->update(['status' => 'completed']);
+        $transaction->transactionable->increment('balance', $transaction->amount);
+        return $transaction;
+    }
+
 
     public function canWithdraw(int|float $amount): bool
     {
@@ -68,6 +101,7 @@ trait HasWallet
             throw new InvalidAmountException();
         }
     }
+
 
     public function throwExceptionIfFundIsInsufficient(int|float $amount): void
     {

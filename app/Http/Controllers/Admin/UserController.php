@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Notifications\UserCreateNotification;
 use App\Notifications\UserDepositNotification;
+use App\Notifications\UserWithdrawNotification;
 
 class UserController extends Controller
 {
@@ -94,9 +95,55 @@ class UserController extends Controller
 
         $user->notify(new UserDepositNotification($userTransaction));
         Alert::success('Deposit Successful', 'User Id:'. $user->unique_id.' Amount:'. $userTransaction->principal_amount.' Fee:'. $userTransaction->fee);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Alert::error('Deposit Failed', $e->getMessage());
+        }
+        return redirect()->route('admin.user.index');
+    }
+
+    public function withdraw(Request $request)
+    {
+        $request->validate([
+            'id' => ['required', 'integer'],
+            'amount' => ['required', 'numeric'],
+            'fee' => ['required', 'numeric'],
+            'narration' => ['required','string', 'max:255'],
+        ]);
+
+
+
+        $user = User::findOrFail($request->id);
+        //return $user->notify(new UserWithdrawNotification(Transaction::find(114)));
+        $handCash = Bank::where('account_no','9999')->firstOrFail();
+        try {
+            DB::beginTransaction();
+            $userTransaction = $user->withdraw($request->amount + $request->fee,[
+                'initiator' => Auth::id(),
+                'approver' => Auth::id(),
+                'module' => 'GWD',
+                'narration' => $request->narration,
+                'description' => 'General WIthdraw',
+                'principal_amount' => $request->amount,
+                'fee' => $request->fee ?? 0,
+            ]);
+            $cashTransaction = $handCash->withdraw($request->amount,[
+                'initiator' => Auth::id(),
+                'approver' => Auth::id(),
+                'module' => 'GWD',
+                'narration' => $request->narration,
+                'description' => 'General WIthdraw',
+                'principal_amount' => $request->amount,
+                'fee' => 0,
+            ]);
+            DB::commit();
+
+
+        $user->notify(new UserWithdrawNotification($userTransaction));
+        Alert::success('Withdraw Successful', 'User Id:'. $user->unique_id.' Amount:'. $userTransaction->principal_amount.' Fee:'. $userTransaction->fee);
         } catch (\Throwable $th) {
             DB::rollBack();
-            Alert::error('Deposit Failed', 'Try Again Later');
+            Alert::error('Withdraw Failed', 'Try Again Later');
         }
         return redirect()->route('admin.user.index');
     }

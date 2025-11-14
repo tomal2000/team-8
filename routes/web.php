@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\PaymentController;
 use App\Models\Designation;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TestController;
 use App\Jobs\ProfitShareDistribute;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\UserCreateNotification;
@@ -20,10 +22,14 @@ use App\Notifications\UserCreateNotification;
 */
 
 Route::get('/', function () {
-    //ProfitShareDistribute::dispatch();
-    return 'ok';
-   // return redirect()->route('login');
+   return redirect()->route('payment.user_find');
 });
+
+Route::get('/user/find', [PaymentController::class, 'user_find'])->name('payment.user_find');
+Route::post('/user/find', [PaymentController::class, 'user_find_get']);
+Route::get('/payment/{id}', [PaymentController::class, 'payment_user'])->name('payment.user');
+
+Route::get('/test', [TestController::class, 'test']);
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');

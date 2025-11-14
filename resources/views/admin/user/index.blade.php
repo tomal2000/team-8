@@ -70,15 +70,14 @@
       </div>
     </div>
   </div>
-    <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="withdrawModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-      <form id="userDepositForm" action="{{ route('admin.user.deposit') }}" method="POST">
+      <form id="userWithDrawForm" action="{{ route('admin.user.withdraw') }}" method="POST">
         <div class="modal-body">
           <div class="row g-3">
             <input type="hidden" class="form-control" id="id" name="id">
@@ -90,6 +89,53 @@
             <div class="col-12">
               <label for="name" class="form-label">Name</label>
               <input type="text" class="form-control" id="name" name="name" disabled>
+            </div>
+            <div class="col-12">
+              <label for="amount" class="form-label required">Amount</label>
+              <input type="text" class="form-control amount" id="amount" name="amount">
+            </div>
+            <div class="col-12">
+                <label for="fee" class="form-label required">Fee</label>
+                <input type="text" class="form-control amount" id="fee" name="fee" value="0.00">
+              </div>
+            <div class="col-12">
+              <label for="narration" class="form-label required">Narration</label>
+              <input type="text" class="form-control" id="narration" name="narration">
+            </div>
+        </div>
+      </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary submit-button">Submit <div class="spinner-border spinner-border-sm loading-section" role="status" style="display: none">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          </button>
+        </div>
+    </form>
+      </div>
+    </div>
+  </div>
+    <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      <form id="userDepositForm" action="{{ route('admin.user.deposit') }}" method="POST">
+        <div class="modal-body">
+          <div class="row g-3">
+            <input type="hidden" class="form-control" id="id_d" name="id">
+                @csrf
+            <div class="col-12">
+              <label for="unique_id" class="form-label">Unique Id</label>
+              <input type="text" class="form-control" id="unique_id_d" name="unique_id" disabled>
+            </div>
+            <div class="col-12">
+              <label for="name" class="form-label">Name</label>
+              <input type="text" class="form-control" id="name_d" name="name" disabled>
             </div>
             <div class="col-12">
               <label for="amount" class="form-label required">Amount</label>
@@ -148,7 +194,7 @@
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->roles->first()->display_name }}</td>
                             <td>{{ $user->balance }}</td>
-                            <td><button data-user="{{ $user->setVisible(['id', 'first_name','last_name','unique_id','mobile']) }}" class="btn btn-primary deposit_modal" type="button">Deposit</button></td>
+                            <td><button data-user="{{ $user->setVisible(['id', 'first_name','last_name','unique_id','mobile']) }}" class="btn btn-primary deposit_modal" type="button">Deposit</button><button data-user="{{ $user->setVisible(['id', 'first_name','last_name','unique_id','mobile']) }}" class="btn btn-primary withdraw_modal" type="button">Withdraw</button></td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -226,10 +272,22 @@
             var data = $(this).data('user')
             var form = $('#userDepositForm');
             form.trigger("reset");
+            $('#name_d').val(data.first_name+' '+data.last_name);
+            $('#unique_id_d').val(data.unique_id);
+            $('#id_d').val(data.id);
+            myModal.show();
+        });
+        $( ".withdraw_modal" ).click(function() {
+            const withdrawModal = new bootstrap.Modal('#withdrawModal', {
+                keyboard: false
+            });
+            var data = $(this).data('user')
+            var form = $('#userWithDrawForm');
+            form.trigger("reset");
             $('#name').val(data.first_name+' '+data.last_name);
             $('#unique_id').val(data.unique_id);
             $('#id').val(data.id);
-            myModal.show();
+            withdrawModal.show();
         });
       </script>
       <script>

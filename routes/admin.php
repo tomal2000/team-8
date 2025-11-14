@@ -38,6 +38,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/create', 'create')->name('create');
         Route::post('/create', 'store');
         Route::post('/deposit', 'deposit')->name('deposit');
+        Route::post('/withdraw', 'withdraw')->name('withdraw');
         Route::get('/transactions', 'transactions')->name('transactions');
         Route::post('/profit/calculate', 'calculateProfit')->name('calculateProfit');
         Route::post('/profit/distribute', 'distributeProfit')->name('distributeProfit');
